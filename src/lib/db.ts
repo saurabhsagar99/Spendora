@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 
 // Add this block for TypeScript global type safety
 declare global {
-  // eslint-disable-next-line no-var
   var mongoose: {
     conn: typeof import('mongoose') | null;
     promise: Promise<typeof import('mongoose')> | null;
