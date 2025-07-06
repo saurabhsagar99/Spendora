@@ -4,8 +4,9 @@ import Transaction from '@/lib/models/Transaction';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await dbConnect();
     
@@ -42,7 +43,7 @@ export async function PUT(
     }
     
     const updatedTransaction = await Transaction.findByIdAndUpdate(
-      params.id,
+      id,
       {
         amount,
         date: date ? new Date(date) : new Date(),
@@ -72,12 +73,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     await dbConnect();
     
-    const deletedTransaction = await Transaction.findByIdAndDelete(params.id);
+    const deletedTransaction = await Transaction.findByIdAndDelete(id);
     
     if (!deletedTransaction) {
       return NextResponse.json(

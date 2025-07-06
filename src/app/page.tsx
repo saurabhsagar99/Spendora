@@ -42,54 +42,35 @@ export default function Dashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBudgetDialogOpen, setIsBudgetDialogOpen] = useState(false);
 
-  // Fetch transactions
-  const fetchTransactions = async () => {
-    try {
-      const response = await fetch(`/api/transactions?month=${selectedMonth}`);
-      if (response.ok) {
-        const data = await response.json();
-        setTransactions(data);
-      }
-    } catch (error) {
-      console.error('Error fetching transactions:', error);
-    }
-  };
 
-  // Fetch analytics
-  const fetchAnalytics = async () => {
-    try {
-      const response = await fetch(`/api/analytics?month=${selectedMonth}`);
-      if (response.ok) {
-        const data = await response.json();
-        setAnalytics(data);
-      }
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
-    }
-  };
-
-  // Fetch budgets
-  const fetchBudgets = async () => {
-    try {
-      const response = await fetch(`/api/budgets?month=${selectedMonth}`);
-      if (response.ok) {
-        // const data = await response.json();
-        // setBudgets(data);
-      }
-    } catch (error) {
-      console.error('Error fetching budgets:', error);
-    }
-  };
 
   // Load all data
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    await Promise.all([
-      fetchTransactions(),
-      fetchAnalytics(),
-      fetchBudgets()
-    ]);
-    setIsLoading(false);
+    try {
+      const response1 = await fetch(`/api/transactions?month=${selectedMonth}`);
+      const response2 = await fetch(`/api/analytics?month=${selectedMonth}`);
+      const response3 = await fetch(`/api/budgets?month=${selectedMonth}`);
+      
+      if (response1.ok) {
+        const data = await response1.json();
+        setTransactions(data);
+      }
+      
+      if (response2.ok) {
+        const data = await response2.json();
+        setAnalytics(data);
+      }
+      
+      if (response3.ok) {
+        // const data = await response3.json();
+        // setBudgets(data);
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   }, [selectedMonth]);
 
   useEffect(() => {
@@ -172,8 +153,7 @@ export default function Dashboard() {
       });
       
       if (response.ok) {
-        await fetchBudgets();
-        await fetchAnalytics();
+        await loadData();
         setIsBudgetDialogOpen(false);
       } else {
         const error = await response.json();
