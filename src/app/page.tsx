@@ -48,6 +48,14 @@ export default function Dashboard() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
+      // Test MongoDB connection first
+      const testResponse = await fetch('/api/transactions');
+      if (!testResponse.ok) {
+        console.error('MongoDB connection test failed:', testResponse.status);
+        alert('Database connection failed. Please check your MongoDB configuration.');
+        return;
+      }
+      
       const response1 = await fetch(`/api/transactions?month=${selectedMonth}`);
       const response2 = await fetch(`/api/analytics?month=${selectedMonth}`);
       const response3 = await fetch(`/api/budgets?month=${selectedMonth}`);
@@ -68,6 +76,7 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Error loading data:', error);
+      alert('Failed to connect to database. Please check your MongoDB configuration.');
     } finally {
       setIsLoading(false);
     }
